@@ -1,5 +1,5 @@
 [project]
-name = "asos-project"
+name = "asos"
 version = "0.1.0"
 description = "Add your description here"
 authors = [
@@ -7,6 +7,8 @@ authors = [
 ]
 dependencies = [
     "django~=4.2",
+    "django-model-utils>=5.0.0",
+    "black>=24.10.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"
@@ -23,4 +25,4 @@ dev-dependencies = []
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/asos_project"]
+packages = ["src/asos"]
