@@ -15,9 +15,15 @@ class Post(TimeStampedModel):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
 
+    def __str__(self):
+        return self.title
+
 
 class Category(TimeStampedModel):
     name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
 
 
 def attachment_user_path(instance, filename):
@@ -28,6 +34,9 @@ class Attachment(TimeStampedModel):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="attachments")
     file = models.FileField(upload_to=attachment_user_path)
 
+    def __str__(self):
+        return self.file.name
+
 
 class Comment(TimeStampedModel):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
@@ -36,6 +45,9 @@ class Comment(TimeStampedModel):
         "self", on_delete=models.PROTECT, related_name="children", blank=True, null=True
     )
     text = models.TextField()
+
+    def __str__(self):
+        return self.text
 
 
 class LikeType(models.TextChoices):
@@ -66,3 +78,6 @@ class Like(TimeStampedModel):
                 name="exactly_one_of_post_or_comment",
             ),
         ]
+
+    def __str__(self):
+        return f"{self.like_type} from {self.author}"
