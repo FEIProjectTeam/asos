@@ -3,20 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/htmx.org"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <title>ASOS</title>
 </head>
 <body>
-    <nav class="flex items-center justify-between">
-        <span>tu je akoze lista horna</span>
-        <div>profil</div>
+    <nav class="flex items-center justify-between p-4 bg-emerald-400 text-white">
+        <span class="font-bold">ASOS</span>
+
+        <div class="space-x-4">
+            {% if user.is_authenticated %}
+                <span>Hello, {{ user.username }}</span>
+                <a href="{% url 'logout' %}" class="btn btn-secondary">Logout</a>
+
+            {% else %}
+                <button hx-get="{% url 'login' %}" hx-target="#modal-placeholder" hx-swap="innerHTML" class="btn btn-primary">
+                    Login
+                </button>
+                <button hx-get="{% url 'register' %}" hx-target="#modal-placeholder" hx-swap="innerHTML" class="btn btn-primary">
+                    Register
+                </button>
+            {% endif %}
+        </div>
     </nav>
 
-    <div class="fixed w-fit inset-0 bg-emerald-400">
-        <div>
-            tu bude obsah modalu cez {%
-        </div>
-    </div>
+    <div id="modal-placeholder"></div>
 
     {% block content %} {% endblock %}
 </body>

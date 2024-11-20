@@ -1,0 +1,28 @@
+{% if not request.htmx %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Register</title>
+    <script src="https://unpkg.com/htmx.org"></script>
+</head>
+<body>
+{% endif %}
+
+<div id="register-modal">
+    <form method="post" action="{% url 'register' %}" hx-target="#register-modal" hx-swap="outerHTML">
+        {% csrf_token %}
+        <h2>Register</h2>
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                Please correct the errors below.
+            </div>
+        {% endif %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Register</button>
+    </form>
+</div>
+
+{% if not request.htmx %}
+</body>
+</html>
+{% endif %}
