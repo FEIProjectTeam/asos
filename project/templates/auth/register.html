@@ -1,15 +1,5 @@
-{% if not request.htmx %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Register</title>
-    <script src="https://unpkg.com/htmx.org"></script>
-</head>
-<body>
-{% endif %}
-
 <div id="register-modal">
-    <form method="post" action="{% url 'register' %}" hx-target="#register-modal" hx-swap="outerHTML">
+    <form hx-post="{% url 'register' %}" hx-target="#register-modal" hx-swap="outerHTML">
         {% csrf_token %}
         <h2>Register</h2>
         {% if form.errors %}
@@ -21,8 +11,3 @@
         <button type="submit" class="btn btn-primary">Register</button>
     </form>
 </div>
-
-{% if not request.htmx %}
-</body>
-</html>
-{% endif %}
