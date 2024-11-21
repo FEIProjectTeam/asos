@@ -8,26 +8,36 @@
     <title>ASOS</title>
 </head>
 <body>
-    <nav class="flex items-center justify-between p-4 bg-emerald-400 text-white">
-        <span class="font-bold">ASOS</span>
+    <nav class="flex fixed inset-x-0 top-0 bg-white items-center justify-between py-4 px-6">
+        <div class="flex items-center gap-1 cursor-pointer">
+            <svg  xmlns="http://www.w3.org/2000/svg"  width="30"  height="30"  viewBox="0 0 24 24"  fill="#dc2626"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8.813 11.612c.457 -.38 .918 -.38 1.386 .011l.108 .098l4.986 4.986l.094 .083a1 1 0 0 0 1.403 -1.403l-.083 -.094l-1.292 -1.293l.292 -.293l.106 -.095c.457 -.38 .918 -.38 1.386 .011l.108 .098l4.674 4.675a4 4 0 0 1 -3.775 3.599l-.206 .005h-12a4 4 0 0 1 -3.98 -3.603l6.687 -6.69l.106 -.095zm9.187 -9.612a4 4 0 0 1 3.995 3.8l.005 .2v9.585l-3.293 -3.292l-.15 -.137c-1.256 -1.095 -2.85 -1.097 -4.096 -.017l-.154 .14l-.307 .306l-2.293 -2.292l-.15 -.137c-1.256 -1.095 -2.85 -1.097 -4.096 -.017l-.154 .14l-5.307 5.306v-9.585a4 4 0 0 1 3.8 -3.995l.2 -.005h12zm-2.99 5l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007z" /></svg>
+            <span class="text-2xl font-medium text-red-600 tracking-tighter">Asos</span>
+        </div>
 
-        <div class="space-x-4">
+        <div class="w-full mx-6 relative">
+            <svg xmlns="http://www.w3.org/2000/svg"  width="20"  height="20"  viewBox="0 0 24 24"  fill="none"  stroke="#a3a3a3"  stroke-width="3"  stroke-linecap="round"  stroke-linejoin="round" class="absolute left-3 top-1/2 -translate-y-1/2"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg>
+            <input type="search" placeholder="Search ..." class="bg-gray-100 hover:bg-gray-200 py-3 pl-10 pr-4 rounded-full w-full">
+        </div>
+
+        <div class="flex space-x-1.5">
             {% if user.is_authenticated %}
-                <span>Hello, {{ user.username }}</span>
-                <a href="{% url 'logout' %}" class="btn btn-secondary">Logout</a>
+            <div class="flex items-center gap-2">
+                <div class="font-medium text-lg cursor-default select-none text-red-600 !w-max">Hello, {{ user.username }}</div>
+                <a href="{% url 'logout' %}" class="bg-gray-200 hover:bg-gray-300 rounded-full w-max py-3 px-4 text-gray-800 font-medium">Log out</a>
+            </div>
 
             {% else %}
-                <button hx-get="{% url 'login' %}" hx-target="#modal-placeholder" hx-swap="innerHTML" class="btn btn-primary">
-                    Login
+                <button hx-get="{% url 'login' %}" hx-target="#modal-placeholder" hx-swap="innerHTML" class="bg-gray-200 hover:bg-gray-300 rounded-full w-max py-3 px-4 text-gray-800 font-medium">
+                    Log in
                 </button>
-                <button hx-get="{% url 'register' %}" hx-target="#modal-placeholder" hx-swap="innerHTML" class="btn btn-primary">
-                    Register
+                <button hx-get="{% url 'register' %}" hx-target="#modal-placeholder" hx-swap="innerHTML" class="bg-red-600 hover:bg-red-700 rounded-full w-max py-3 px-4 text-white font-medium">
+                    Sign up
                 </button>
             {% endif %}
         </div>
     </nav>
 
-    <div id="modal-placeholder"></div>
+    <div id="modal-placeholder" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
 
     {% block content %} {% endblock %}
 </body>
