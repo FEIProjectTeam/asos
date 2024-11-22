@@ -12,13 +12,17 @@
 -e file:.
 asgiref==3.8.1
     # via django
+    # via django-htmx
 black==24.10.0
     # via asos
 click==8.1.7
     # via black
 django==4.2.16
     # via asos
+    # via django-htmx
     # via django-model-utils
+django-htmx==1.21.0
+    # via asos
 django-model-utils==5.0.0
     # via asos
 mypy-extensions==1.0.0
