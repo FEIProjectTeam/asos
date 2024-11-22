@@ -7,7 +7,6 @@ import django.utils.timezone
 import model_utils.fields
 import project.models
 
-
 class Migration(migrations.Migration):
 
     initial = True

@@ -2,20 +2,25 @@ from collections import defaultdict
 from typing import Any
 
 from django.contrib.auth import get_user_model, login, authenticate
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models import Count, Q, Value, Prefetch
 from django.http import Http404, HttpResponseRedirect
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
 from django.views import View
 from django.views.generic import TemplateView, CreateView, FormView
-from django.contrib.auth.forms import UserCreationForm
-from django_htmx.http import HttpResponseClientRedirect, retarget
-from django.shortcuts import get_object_or_404
+from django_htmx.http import HttpResponseClientRedirect
+from django_htmx.http import retarget
 
 from .forms import CommentForm, LikeForm
-from .models import Post, Comment, LikeType, Like
+from .forms import PostForm, AttachmentForm
+from .models import Comment, LikeType, Like
+from .models import Post
 
 
 class HomeView(TemplateView):
@@ -190,3 +195,45 @@ class CommentLikeView(BaseLikeView):
         return HttpResponseClientRedirect(
             reverse("post_detail", kwargs={"post_id": post_id})
         )
+
+
+class CreatePost(TemplateView):
+    template_name = "post/createPost.html"
+
+    def get(self, request, *args, **kwargs):
+        post_form = PostForm()
+        attachment_form = AttachmentForm()
+        return render(
+            request,
+            self.template_name,
+            {"post_form": post_form, "attachment_form": attachment_form},
+        )
+
+    def post(self, request, *args, **kwargs):
+        post_form = PostForm(request.POST, request.FILES)
+        attachment_form = AttachmentForm(request.POST, request.FILES)
+        if post_form.is_valid() and attachment_form.is_valid():
+            post = post_form.save(commit=False)
+            post.author = request.user
+            post.save()
+
+            attachment = attachment_form.save(commit=False)
+            attachment.post = post
+            attachment.save()
+
+            return JsonResponse(
+                {
+                    "message": "Post and attachment created successfully!",
+                    "post_id": post.id,
+                }
+            )
+        else:
+            return render(
+                request,
+                self.template_name,
+                {
+                    "post_form": post_form.errors,
+                    "attachment_form": attachment_form.errors,
+                },
+                status=400,
+            )

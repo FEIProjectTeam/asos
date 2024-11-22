@@ -12,7 +12,9 @@ from project.views import (
     CommentFormView,
     PostLikeView,
     CommentLikeView,
+    CreatePost,
 )
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -20,6 +22,7 @@ urlpatterns = [
     path("login/", LoginView.as_view(), name="login"),
     path("register/", RegisterView.as_view(), name="register"),
     path("logout/", LogoutView.as_view(), name="logout"),
+    path("create-post/", CreatePost.as_view(), name="create-post"),
     path("post/<int:post_id>/", PostDetailView.as_view(), name="post_detail"),
     path("post/<int:post_id>/like/", PostLikeView.as_view(), name="post_like"),
     path(

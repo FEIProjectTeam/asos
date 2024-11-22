@@ -1,0 +1,77 @@
+<div id="create-post-modal" hx-get="{% url 'home' %}" hx-swap="delete"
+     class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div onclick="event.stopPropagation()" class="bg-white shadow-xl min-w-[600px] max-w-[800px] p-12 rounded-3xl">
+        <div class="flex flex-inline items-center gap-3 mb-8">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="#2563eb"
+                 class="icon icon-tabler icons-tabler-filled icon-tabler-edit">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                <path d="M15 5l4 4l-9 9h-4v-4z"/>
+                <path d="M12 3l3 3"/>
+            </svg>
+            <h2 class="text-3xl font-medium">Create a New Post</h2>
+        </div>
+
+        <form hx-post="{% url 'create-post' %}" hx-target="#create-post-modal" hx-swap="outerHTML"
+              class="flex flex-col gap-2 min-w-[600px]" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="flex flex-inline gap-3">
+                <div class="form-group flex flex-col gap-1">
+                    {{ post_form }}
+                </div>
+                <div class="form-group flex flex-col gap-1">
+                    {{ attachment_form.as_p }}
+                    <div class="flex flex-col items-center">
+                        <div id="image-preview-header"
+                             class="w-48 h-48 rounded-2xl border border-gray-300 flex items-center justify-center hidden">
+                            <img id="image-preview" class="rounded-2xl" style="max-width: 100%; max-height: 100%;"/>
+                        </div>
+                        <button id="delete-image"
+                            class="mt-2 hidden bg-red-600 hover:bg-red-700 text-white py-1 px-4 rounded-full"
+                            onclick="deleteImage(event)">Delete Image
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white py-2.5 mt-4 rounded-full font-medium">
+                Create Post
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function previewImage(event) {
+        const input = event.target;
+        const preview = document.getElementById('image-preview');
+        const previewHeader = document.getElementById('image-preview-header');
+        const deleteButton = document.getElementById('delete-image');
+        const reader = new FileReader();
+
+        reader.onload = function () {
+            preview.src = reader.result;
+            preview.classList.remove('hidden');
+            deleteButton.classList.remove('hidden');
+        };
+
+        if (input.files && input.files[0]) {
+            reader.readAsDataURL(input.files[0]);
+            previewHeader.classList.remove('hidden');
+            input.classList.add('hidden');
+        }
+    }
+
+    function deleteImage(event) {
+        event.preventDefault();
+        const input = document.getElementById('id_file');
+        const preview = document.getElementById('image-preview');
+        const previewHeader = document.getElementById('image-preview-header');
+        const deleteButton = document.getElementById('delete-image');
+
+        input.value = '';
+        preview.src = '';
+        input.classList.remove('hidden');
+        preview.classList.add('hidden');
+        deleteButton.classList.add('hidden');
+        previewHeader.classList.add('hidden');
+    }
+</script>
