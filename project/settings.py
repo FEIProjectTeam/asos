@@ -18,7 +18,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -30,6 +29,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "project",
     "django_htmx",
+    "django.contrib.humanize",
 ]
 
 MIDDLEWARE = [
@@ -122,3 +122,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_URL = reverse_lazy("login")
 LOGIN_REDIRECT_URL = reverse_lazy("home")
 LOGOUT_REDIRECT_URL = reverse_lazy("home")
+
+
+MEDIA_URL = '/'
+MEDIA_ROOT = os.path.join(BASE_DIR, '')

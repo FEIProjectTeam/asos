@@ -1,0 +1,53 @@
+{% load humanize %}
+<div class="">
+    <p class="font-semibold">{{ comment.author.username }}</p>
+    <p class="text-gray-600">{{ comment.text }}</p>
+    <p class="text-sm text-gray-400">{{ comment.created|naturaltime }}</p>
+
+    <!-- Like Display -->
+    <div class="flex items-center mt-2 gap-2">
+        <!-- Like -->
+        <div class="relative group">
+            <span class="text-blue-500 cursor-pointer">👍 {{ comment.like_count }}</span>
+            <div class="absolute left-0 w-max bg-white border rounded-lg shadow-lg p-2 hidden group-hover:block">
+                {% for user in comment.like_users %}
+                    <p class="text-sm">{{ user }}</p>
+                {% empty %}
+                    <p class="text-sm text-gray-500">No likes yet</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Heart -->
+        <div class="relative group">
+            <span class="text-red-500 cursor-pointer">❤️ {{ comment.heart_count }}</span>
+            <div class="absolute left-0 w-max bg-white border rounded-lg shadow-lg p-2 hidden group-hover:block">
+                {% for user in comment.heart_users %}
+                    <p class="text-sm">{{ user }}</p>
+                {% empty %}
+                    <p class="text-sm text-gray-500">No hearts yet</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Laugh -->
+        <div class="relative group">
+            <span class="text-yellow-500 cursor-pointer">😂 {{ comment.laugh_count }}</span>
+            <div class="absolute left-0 w-max bg-white border rounded-lg shadow-lg p-2 hidden group-hover:block">
+                {% for user in comment.laugh_users %}
+                    <p class="text-sm">{{ user }}</p>
+                {% empty %}
+                    <p class="text-sm text-gray-500">No laughs yet</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    {% if comment.children.all %}
+        <div class="mt-2 space-y-2 ml-6">
+            {% for reply in comment.children.all %}
+                {% include "comment.html" with comment=reply %}
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>

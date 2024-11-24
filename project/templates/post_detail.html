@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="min-h-[calc(100vh-80px)] p-4 pt-[80px]">
+    <a href="{% url 'home' %}" class="text-gray-500 hover:text-red-400 hover:underline flex items-center">
+        <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-left"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 6l-6 6l6 6" /></svg>
+        Back
+    </a>
+
+    <div class="bg-white grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+        <div class="max-w-[1000px]">
+            {% for attachment in post.attachments.all %}
+            <div class="mySlides relative">
+                <img src="{{ attachment.file.url }}" alt="Attachment Image" class="w-full rounded-xl">
+                <a class="absolute top-1/2 left-0 p-2 text-white font-bold text-[18px] select-none hover:bg-black/50 p-3 rounded-r-md cursor-pointer -translate-y-1/2 transition-colors" onclick="plusSlides(-1)">❮</a>
+                <a class="absolute top-1/2 right-0 p-2 text-white font-bold text-[18px] select-none hover:bg-black/50 p-3 rounded-l-md cursor-pointer -translate-y-1/2 transition-colors" onclick="plusSlides(1)">❯</a>
+            </div>
+            {% empty %}
+                <p class="text-gray-500">No attachments available.</p>
+            {% endfor %}
+
+            <div class="flex justify-center mt-4 gap-1">
+                {% for attachment in post.attachments.all %}
+                    <div class="dot size-3 bg-gray-400 rounded-full cursor-pointer" onclick="currentSlide({{ forloop.counter }})"></div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div>
+            <h1 class="text-3xl font-bold">{{ post.title }}</h1>
+            <p class="font-medium text-gray-500 mt-1">Categories: {{ post.category.name }}</p>
+            <p class="text-gray-500 mt-2">By {{ post.author.username }}</p>
+            <p class="text-gray-600 mt-3">{{ post.description }}</p>
+
+            <div class="mt-5">
+                <h2 class="text-xl font-semibold">{{ comments.count }} Comments</h2>
+                <div class="space-y-2">
+                    {% for comment in comments %}
+                        {% include "comment.html" with comment=comment %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    let slideIndex = 1;
+    showSlides(slideIndex);
+
+    function plusSlides(n) {
+        showSlides(slideIndex += n);
+    }
+
+    function currentSlide(n) {
+        showSlides(slideIndex = n);
+    }
+
+    function showSlides(n) {
+        let i;
+        let slides = document.getElementsByClassName("mySlides");
+        let dots = document.getElementsByClassName("dot");
+        if (n > slides.length) {slideIndex = 1}
+        if (n < 1) {slideIndex = slides.length}
+        for (i = 0; i < slides.length; i++) {
+            slides[i].style.display = "none";
+        }
+        for (i = 0; i < dots.length; i++) {
+            dots[i].className = dots[i].className.replace(" !bg-gray-600", "");
+        }
+        slides[slideIndex-1].style.display = "block";
+        dots[slideIndex-1].className += " !bg-gray-600";
+    }
+</script>
+{% endblock content %}
