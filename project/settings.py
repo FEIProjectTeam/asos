@@ -124,5 +124,7 @@ LOGIN_REDIRECT_URL = reverse_lazy("home")
 LOGOUT_REDIRECT_URL = reverse_lazy("home")
 
 
-MEDIA_URL = '/'
-MEDIA_ROOT = os.path.join(BASE_DIR, '')
+MEDIA_URL = "/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "")
+
+APPEND_SLASH = True
