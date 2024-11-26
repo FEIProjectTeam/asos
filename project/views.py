@@ -326,3 +326,14 @@ class CreatePost(TemplateView):
                 },
                 status=400,
             )
+
+class ImageView(View):
+    def get(self, request):
+
+        # loadni obrazky a jebni ich do images_to_show a cislo dalsej strany do next_page
+
+        return render(
+            request,
+            "partials/images.html",
+            {"images": images_to_show, "page": next_page},
+        )
