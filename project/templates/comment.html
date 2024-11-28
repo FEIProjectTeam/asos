@@ -3,14 +3,18 @@
 <div class="">
     <p class="font-semibold">{{ comment.author.username }}</p>
     <p class="text-gray-600">{{ comment.text }}</p>
-    <p class="text-sm text-gray-400">{{ comment.created|naturaltime }}</p>
+    <div class="flex items-center gap-2">
+        <p class="text-sm text-gray-400">{{ comment.created|naturaltime }}</p>
+        <button class="inline font-medium hover:text-gray-600 hover:underline transition-all">Reply</button>
+    </div>
+
 
     <!-- Like Display -->
     <div class="flex items-center mt-2 gap-2">
         <!-- Like -->
         <div class="relative group">
-            <span class="text-blue-500 cursor-pointer">👍 {{ comment.like_count }}</span>
-            <div class="absolute left-0 w-max bg-white border rounded-lg shadow-lg p-2 hidden group-hover:block">
+            <button class="text-blue-500 cursor-pointer">👍 {{ comment.like_count }}</button>
+            <div class="absolute left-0 w-max bg-white border rounded-lg shadow-lg p-2 hidden group-hover:block z-50">
                 {% for user in comment.like_authors %}
                     <p class="text-sm">{{ user }}</p>
                 {% empty %}
@@ -21,8 +25,8 @@
 
         <!-- Heart -->
         <div class="relative group">
-            <span class="text-red-500 cursor-pointer">❤️ {{ comment.heart_count }}</span>
-            <div class="absolute left-0 w-max bg-white border rounded-lg shadow-lg p-2 hidden group-hover:block">
+            <button class="text-red-500 cursor-pointer">❤️ {{ comment.heart_count }}</button>
+            <div class="absolute left-0 w-max bg-white border rounded-lg shadow-lg p-2 hidden group-hover:block z-50">
                 {% for user in comment.heart_authors %}
                     <p class="text-sm">{{ user }}</p>
                 {% empty %}
@@ -33,8 +37,8 @@
 
         <!-- Laugh -->
         <div class="relative group">
-            <span class="text-yellow-500 cursor-pointer">😂 {{ comment.laugh_count }}</span>
-            <div class="absolute left-0 w-max bg-white border rounded-lg shadow-lg p-2 hidden group-hover:block">
+            <button class="text-yellow-500 cursor-pointer">😂 {{ comment.laugh_count }}</button>
+            <div class="absolute left-0 w-max bg-white border rounded-lg shadow-lg p-2 hidden group-hover:block z-50">
                 {% for user in comment.laugh_authors %}
                     <p class="text-sm">{{ user }}</p>
                 {% empty %}
