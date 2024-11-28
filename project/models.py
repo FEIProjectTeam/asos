@@ -77,6 +77,12 @@ class Like(TimeStampedModel):
                 ),
                 name="exactly_one_of_post_or_comment",
             ),
+            models.UniqueConstraint(
+                fields=["author", "post"], name="unique_like_per_post"
+            ),
+            models.UniqueConstraint(
+                fields=["author", "comment"], name="unique_like_per_comment"
+            ),
         ]
 
     def __str__(self):
