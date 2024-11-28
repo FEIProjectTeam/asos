@@ -40,13 +40,16 @@ class AttachmentForm(forms.ModelForm):
     class Meta:
         model = Attachment
         fields = ["file"]
+        labels = {
+            "file": ""
+        }
         widgets = {
             "file": forms.FileInput(
                 attrs={
-                    "class": "form-control w-48 h-48 rounded-2xl border-[2.5px] border-neutral-300 p-4",
+                    "class": "file-input form-control w-48 h-48 mt-7 rounded-2xl border-[2.5px] border-neutral-300 p-4",
                     "id": "id_file",
                     "onchange": "previewImage(event)",
-                }
+                },
             ),
         }
 
