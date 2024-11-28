@@ -1,11 +1,18 @@
+from collections import defaultdict
+from typing import Any
+
 from django.contrib.auth import get_user_model, login, authenticate
 from django.contrib.auth.views import LoginView as DjangoLoginView
+from django.contrib.postgres.aggregates import ArrayAgg
+from django.db.models import Count, Q, Value, Prefetch
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, CreateView
 from django.contrib.auth.forms import UserCreationForm
 from django_htmx.http import HttpResponseClientRedirect
-from django.shortcuts import render, get_object_or_404
-from .models import Post
+from django.shortcuts import get_object_or_404
+
+from .forms import CommentCreateForm
+from .models import Post, Comment, LikeType, Like
 
 
 class HomeView(TemplateView):
@@ -36,28 +43,94 @@ class RegisterView(CreateView):
         return HttpResponseClientRedirect(self.get_success_url())
 
 
-def PostDetail(request, pk):
-    post = get_object_or_404(Post, pk=pk)
-    comments = post.comments.filter(parent__isnull=True).prefetch_related(
-        'children__children', 'likes__author', 'children__likes__author'
-    )
+class PostDetailView(TemplateView):
+    template_name = "post_detail.html"
 
-    # Pre-process comments and nested replies
-    for comment in comments:
-        process_comment_likes(comment)
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
+        post_id: int = kwargs["post_id"]
+        likes_prefetch = Prefetch(
+            "likes", queryset=Like.objects.all().select_related("author")
+        )
+        post = get_object_or_404(
+            Post.objects.filter(id=post_id)
+            .select_related("category")
+            .prefetch_related("attachments", likes_prefetch)
+            .annotate(
+                like_count=Count(
+                    "likes", filter=Q(likes__like_type=LikeType.LIKE), distinct=True
+                ),
+                heart_count=Count(
+                    "likes", filter=Q(likes__like_type=LikeType.HEART), distinct=True
+                ),
+                laugh_count=Count(
+                    "likes", filter=Q(likes__like_type=LikeType.LAUGH), distinct=True
+                ),
+                like_authors=ArrayAgg(
+                    "likes__author__username",
+                    filter=Q(likes__like_type=LikeType.LIKE),
+                    default=Value([]),
+                ),
+                heart_authors=ArrayAgg(
+                    "likes__author__username",
+                    filter=Q(likes__like_type=LikeType.HEART),
+                    default=Value([]),
+                ),
+                laugh_authors=ArrayAgg(
+                    "likes__author__username",
+                    filter=Q(likes__like_type=LikeType.LAUGH),
+                    default=Value([]),
+                ),
+            )
+        )
+        comments = (
+            Comment.objects.filter(post=post)
+            .select_related("author")
+            .prefetch_related("likes__author")
+            .annotate(
+                like_count=Count(
+                    "likes", filter=Q(likes__like_type=LikeType.LIKE), distinct=True
+                ),
+                heart_count=Count(
+                    "likes", filter=Q(likes__like_type=LikeType.HEART), distinct=True
+                ),
+                laugh_count=Count(
+                    "likes", filter=Q(likes__like_type=LikeType.LAUGH), distinct=True
+                ),
+                like_authors=ArrayAgg(
+                    "likes__author__username",
+                    filter=Q(likes__like_type=LikeType.LIKE),
+                    default=Value([]),
+                ),
+                heart_authors=ArrayAgg(
+                    "likes__author__username",
+                    filter=Q(likes__like_type=LikeType.HEART),
+                    default=Value([]),
+                ),
+                laugh_authors=ArrayAgg(
+                    "likes__author__username",
+                    filter=Q(likes__like_type=LikeType.LAUGH),
+                    default=Value([]),
+                ),
+            )
+        )
+        replies = defaultdict(list)
+        top_lvl_comments = []
+        comment_count = 0
+        for comment in comments:
+            comment_count += 1
+            if comment.parent:
+                replies[comment.parent.id].append(comment)
+            else:
+                top_lvl_comments.append(comment)
+        kwargs["post"] = post
+        kwargs["comment_count"] = comment_count
+        kwargs["top_lvl_comments"] = top_lvl_comments
+        kwargs["replies"] = replies
+        return super().get_context_data(**kwargs)
 
-    return render(request, 'post_detail.html', {'post': post, 'comments': comments})
 
-
-def process_comment_likes(comment):
-    """Recursively process likes for a comment and its replies."""
-    comment.like_count = comment.likes.filter(like_type='like').count()
-    comment.heart_count = comment.likes.filter(like_type='heart').count()
-    comment.laugh_count = comment.likes.filter(like_type='laugh').count()
-    comment.like_users = comment.likes.filter(like_type='like').values_list('author__username', flat=True)
-    comment.heart_users = comment.likes.filter(like_type='heart').values_list('author__username', flat=True)
-    comment.laugh_users = comment.likes.filter(like_type='laugh').values_list('author__username', flat=True)
-
-    # Process children recursively
-    for reply in comment.children.all():
-        process_comment_likes(reply)
+class CommentCreateView(CreateView):
+    model = Comment
+    form_class = CommentCreateForm
+    fields = ["text"]
+    pass

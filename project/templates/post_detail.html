@@ -30,7 +30,7 @@
             <p class="font-medium text-gray-500 mt-1">Categories: {{ post.category.name }}</p>
             <p class="text-gray-500 mt-2">By {{ post.author.username }}</p>
             <p class="text-gray-600 mt-3">{{ post.description }}</p>
-        
+
             <!-- Like Display -->
             <div class="flex items-center mt-2 gap-2">
                 <!-- Like -->
@@ -44,7 +44,7 @@
                         {% endfor %}
                     </div>
                 </div>
-        
+
                 <!-- Heart -->
                 <div class="relative group">
                     <span class="text-red-500 cursor-pointer">❤️ {{ post.heart_count }}</span>
@@ -56,7 +56,7 @@
                         {% endfor %}
                     </div>
                 </div>
-        
+
                 <!-- Laugh -->
                 <div class="relative group">
                     <span class="text-yellow-500 cursor-pointer">😂 {{ post.laugh_count }}</span>
@@ -71,7 +71,7 @@
             </div>
 
             <div class="mt-5">
-                <h2 class="text-xl font-semibold">{{ post.comment_count }} Comments</h2>
+                <h2 class="text-xl font-semibold">{{ comment_count }} Comments</h2>
                 <div class="space-y-2">
                     {% for comment in top_lvl_comments %}
                         {% include "comment.html" with comment=comment %}
