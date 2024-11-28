@@ -68,13 +68,13 @@ WSGI_APPLICATION = "project.wsgi.application"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB', 'postgres'),
-        'USER': os.getenv('POSTGRES_USER', 'postgres'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'password'),
-        'HOST': os.getenv('POSTGRES_HOST', 'db'),
-        'PORT': os.getenv('POSTGRES_PORT', '5432'),
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("POSTGRES_DB", "postgres"),
+        "USER": os.getenv("POSTGRES_USER", "postgres"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD", "password"),
+        "HOST": os.getenv("POSTGRES_HOST", "db"),
+        "PORT": os.getenv("POSTGRES_PORT", "5432"),
     }
 }
 
@@ -124,7 +124,5 @@ LOGIN_REDIRECT_URL = reverse_lazy("home")
 LOGOUT_REDIRECT_URL = reverse_lazy("home")
 
 
-MEDIA_URL = "/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "")
-
-APPEND_SLASH = True
+MEDIA_URL = "media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")

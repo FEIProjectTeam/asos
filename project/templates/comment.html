@@ -1,4 +1,5 @@
-{% load humanize %}
+{% load humanize asos_tags %}
+
 <div class="">
     <p class="font-semibold">{{ comment.author.username }}</p>
     <p class="text-gray-600">{{ comment.text }}</p>
@@ -10,7 +11,7 @@
         <div class="relative group">
             <span class="text-blue-500 cursor-pointer">👍 {{ comment.like_count }}</span>
             <div class="absolute left-0 w-max bg-white border rounded-lg shadow-lg p-2 hidden group-hover:block">
-                {% for user in comment.like_users %}
+                {% for user in comment.like_authors %}
                     <p class="text-sm">{{ user }}</p>
                 {% empty %}
                     <p class="text-sm text-gray-500">No likes yet</p>
@@ -22,7 +23,7 @@
         <div class="relative group">
             <span class="text-red-500 cursor-pointer">❤️ {{ comment.heart_count }}</span>
             <div class="absolute left-0 w-max bg-white border rounded-lg shadow-lg p-2 hidden group-hover:block">
-                {% for user in comment.heart_users %}
+                {% for user in comment.heart_authors %}
                     <p class="text-sm">{{ user }}</p>
                 {% empty %}
                     <p class="text-sm text-gray-500">No hearts yet</p>
@@ -34,7 +35,7 @@
         <div class="relative group">
             <span class="text-yellow-500 cursor-pointer">😂 {{ comment.laugh_count }}</span>
             <div class="absolute left-0 w-max bg-white border rounded-lg shadow-lg p-2 hidden group-hover:block">
-                {% for user in comment.laugh_users %}
+                {% for user in comment.laugh_authors %}
                     <p class="text-sm">{{ user }}</p>
                 {% empty %}
                     <p class="text-sm text-gray-500">No laughs yet</p>
@@ -43,9 +44,9 @@
         </div>
     </div>
 
-    {% if comment.children.all %}
+    {% if comment.id in replies %}
         <div class="mt-2 space-y-2 ml-6">
-            {% for reply in comment.children.all %}
+            {% for reply in replies|get_item:comment.id %}
                 {% include "comment.html" with comment=reply %}
             {% endfor %}
         </div>
