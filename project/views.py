@@ -6,12 +6,12 @@ from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models import Count, Q, Value, Prefetch
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView, CreateView
+from django.views.generic import TemplateView, CreateView, FormView
 from django.contrib.auth.forms import UserCreationForm
 from django_htmx.http import HttpResponseClientRedirect
 from django.shortcuts import get_object_or_404
 
-from .forms import CommentCreateForm
+from .forms import CommentForm
 from .models import Post, Comment, LikeType, Like
 
 
@@ -129,8 +129,20 @@ class PostDetailView(TemplateView):
         return super().get_context_data(**kwargs)
 
 
-class CommentCreateView(CreateView):
-    model = Comment
-    form_class = CommentCreateForm
-    fields = ["text"]
-    pass
+class CommentFormView(FormView):
+    template_name = "comment.html"
+    form_class = CommentForm
+
+    def form_valid(self, form):
+        post_id: int = self.kwargs["post_id"]
+        parent_id: int | None = self.kwargs.get("parent_id")
+        comment = Comment(
+            post_id=post_id,
+            author=self.request.user,
+            parent_id=parent_id,
+            **form.cleaned_data,
+        )
+        comment.save()
+        return HttpResponseClientRedirect(
+            reverse_lazy("post_detail", kwargs={"post_id": self.kwargs["post_id"]})
+        )
