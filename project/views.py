@@ -6,12 +6,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models import Count, Q, Value, Prefetch
-from django.http import Http404
-from django.urls import reverse_lazy
+from django.http import Http404, HttpResponseRedirect
+from django.urls import reverse_lazy, reverse
 from django.views import View
 from django.views.generic import TemplateView, CreateView, FormView
 from django.contrib.auth.forms import UserCreationForm
-from django_htmx.http import HttpResponseClientRedirect
+from django_htmx.http import HttpResponseClientRedirect, retarget
 from django.shortcuts import get_object_or_404
 
 from .forms import CommentForm, LikeForm
@@ -24,6 +24,10 @@ class HomeView(TemplateView):
 
 class LoginView(DjangoLoginView):
     template_name = "auth/login.html"
+
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+        return retarget(response, "#modal-placeholder")
 
     def form_valid(self, form):
         super().form_valid(form)
@@ -125,9 +129,14 @@ class CommentFormView(LoginRequiredMixin, FormView):
         )
 
 
-class PostLikeView(LoginRequiredMixin, View):
+class BaseLikeView(LoginRequiredMixin, View):
     form_class = LikeForm
 
+    def get(self, request, post_id: int, *args, **kwargs):
+        return HttpResponseRedirect(reverse("post_detail", kwargs={"post_id": post_id}))
+
+
+class PostLikeView(BaseLikeView):
     def post(self, request, post_id: int, *args, **kwargs):
         form = self.form_class(request.POST)
         if not Post.objects.filter(id=post_id).exists():
@@ -145,13 +154,11 @@ class PostLikeView(LoginRequiredMixin, View):
             else:
                 Like(post_id=post_id, author=request.user, like_type=like_type).save()
         return HttpResponseClientRedirect(
-            reverse_lazy("post_detail", kwargs={"post_id": post_id})
+            reverse("post_detail", kwargs={"post_id": post_id})
         )
 
 
-class CommentLikeView(LoginRequiredMixin, View):
-    form_class = LikeForm
-
+class CommentLikeView(BaseLikeView):
     def post(self, request, post_id: int, comment_id: int, *args, **kwargs):
         form = self.form_class(request.POST)
         if (
@@ -176,5 +183,5 @@ class CommentLikeView(LoginRequiredMixin, View):
                     comment_id=comment_id, author=request.user, like_type=like_type
                 ).save()
         return HttpResponseClientRedirect(
-            reverse_lazy("post_detail", kwargs={"post_id": post_id})
+            reverse("post_detail", kwargs={"post_id": post_id})
         )
