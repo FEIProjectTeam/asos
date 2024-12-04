@@ -14,7 +14,12 @@
     <div class="flex items-center mt-2 gap-2">
         <!-- Like -->
         <div class="relative group">
-            <button class="text-blue-500 cursor-pointer">👍 {{ comment.like_count }}</button>
+            <form hx-post="{% url 'comment_like' post_id=comment.post_id comment_id=comment.id %}" hx-trigger="submit"
+                  class="w-full">
+                {% csrf_token %}
+                <input type="hidden" name="like_type" value="like" required>
+                <button type="submit" class="text-blue-500 cursor-pointer">👍 {{ comment.like_count }}</button>
+            </form>
             <div class="absolute left-0 w-max bg-white border rounded-lg shadow-lg p-2 hidden group-hover:block z-50">
                 {% for user in comment.like_authors %}
                     <p class="text-sm">{{ user }}</p>
@@ -26,7 +31,12 @@
 
         <!-- Heart -->
         <div class="relative group">
-            <button class="text-red-500 cursor-pointer">❤️ {{ comment.heart_count }}</button>
+            <form hx-post="{% url 'comment_like' post_id=comment.post_id comment_id=comment.id %}" hx-trigger="submit"
+                  class="w-full">
+                {% csrf_token %}
+                <input type="hidden" name="like_type" value="heart" required>
+                <button type="submit" class="text-blue-500 cursor-pointer">❤️ {{ comment.heart_count }}</button>
+            </form>
             <div class="absolute left-0 w-max bg-white border rounded-lg shadow-lg p-2 hidden group-hover:block z-50">
                 {% for user in comment.heart_authors %}
                     <p class="text-sm">{{ user }}</p>
@@ -38,7 +48,12 @@
 
         <!-- Laugh -->
         <div class="relative group">
-            <button class="text-yellow-500 cursor-pointer">😂 {{ comment.laugh_count }}</button>
+            <form hx-post="{% url 'comment_like' post_id=comment.post_id comment_id=comment.id %}" hx-trigger="submit"
+                  class="w-full">
+                {% csrf_token %}
+                <input type="hidden" name="like_type" value="laugh" required>
+                <button type="submit" class="text-blue-500 cursor-pointer">😂 {{ comment.laugh_count }}</button>
+            </form>
             <div class="absolute left-0 w-max bg-white border rounded-lg shadow-lg p-2 hidden group-hover:block z-50">
                 {% for user in comment.laugh_authors %}
                     <p class="text-sm">{{ user }}</p>

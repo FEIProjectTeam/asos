@@ -2,16 +2,19 @@ from collections import defaultdict
 from typing import Any
 
 from django.contrib.auth import get_user_model, login, authenticate
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models import Count, Q, Value, Prefetch
+from django.http import Http404
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import TemplateView, CreateView, FormView
 from django.contrib.auth.forms import UserCreationForm
 from django_htmx.http import HttpResponseClientRedirect
 from django.shortcuts import get_object_or_404
 
-from .forms import CommentForm
+from .forms import CommentForm, LikeForm
 from .models import Post, Comment, LikeType, Like
 
 
@@ -46,6 +49,16 @@ class RegisterView(CreateView):
 class PostDetailView(TemplateView):
     template_name = "post_detail.html"
 
+    def _annotate_like_count(self, like_type: LikeType = LikeType.LIKE):
+        return Count("likes", filter=Q(likes__like_type=like_type), distinct=True)
+
+    def _annotate_like_authors(self, like_type: LikeType = LikeType.LIKE):
+        return ArrayAgg(
+            "likes__author__username",
+            filter=Q(likes__like_type=like_type),
+            default=Value([]),
+        )
+
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         post_id: int = kwargs["post_id"]
         likes_prefetch = Prefetch(
@@ -56,30 +69,12 @@ class PostDetailView(TemplateView):
             .select_related("category")
             .prefetch_related("attachments", likes_prefetch)
             .annotate(
-                like_count=Count(
-                    "likes", filter=Q(likes__like_type=LikeType.LIKE), distinct=True
-                ),
-                heart_count=Count(
-                    "likes", filter=Q(likes__like_type=LikeType.HEART), distinct=True
-                ),
-                laugh_count=Count(
-                    "likes", filter=Q(likes__like_type=LikeType.LAUGH), distinct=True
-                ),
-                like_authors=ArrayAgg(
-                    "likes__author__username",
-                    filter=Q(likes__like_type=LikeType.LIKE),
-                    default=Value([]),
-                ),
-                heart_authors=ArrayAgg(
-                    "likes__author__username",
-                    filter=Q(likes__like_type=LikeType.HEART),
-                    default=Value([]),
-                ),
-                laugh_authors=ArrayAgg(
-                    "likes__author__username",
-                    filter=Q(likes__like_type=LikeType.LAUGH),
-                    default=Value([]),
-                ),
+                like_count=self._annotate_like_count(),
+                heart_count=self._annotate_like_count(LikeType.HEART),
+                laugh_count=self._annotate_like_count(LikeType.LAUGH),
+                like_authors=self._annotate_like_authors(),
+                heart_authors=self._annotate_like_authors(LikeType.HEART),
+                laugh_authors=self._annotate_like_authors(LikeType.LAUGH),
             )
         )
         comments = (
@@ -87,30 +82,12 @@ class PostDetailView(TemplateView):
             .select_related("author")
             .prefetch_related("likes__author")
             .annotate(
-                like_count=Count(
-                    "likes", filter=Q(likes__like_type=LikeType.LIKE), distinct=True
-                ),
-                heart_count=Count(
-                    "likes", filter=Q(likes__like_type=LikeType.HEART), distinct=True
-                ),
-                laugh_count=Count(
-                    "likes", filter=Q(likes__like_type=LikeType.LAUGH), distinct=True
-                ),
-                like_authors=ArrayAgg(
-                    "likes__author__username",
-                    filter=Q(likes__like_type=LikeType.LIKE),
-                    default=Value([]),
-                ),
-                heart_authors=ArrayAgg(
-                    "likes__author__username",
-                    filter=Q(likes__like_type=LikeType.HEART),
-                    default=Value([]),
-                ),
-                laugh_authors=ArrayAgg(
-                    "likes__author__username",
-                    filter=Q(likes__like_type=LikeType.LAUGH),
-                    default=Value([]),
-                ),
+                like_count=self._annotate_like_count(),
+                heart_count=self._annotate_like_count(LikeType.HEART),
+                laugh_count=self._annotate_like_count(LikeType.LAUGH),
+                like_authors=self._annotate_like_authors(),
+                heart_authors=self._annotate_like_authors(LikeType.HEART),
+                laugh_authors=self._annotate_like_authors(LikeType.LAUGH),
             )
         )
         replies = defaultdict(list)
@@ -129,7 +106,7 @@ class PostDetailView(TemplateView):
         return super().get_context_data(**kwargs)
 
 
-class CommentFormView(FormView):
+class CommentFormView(LoginRequiredMixin, FormView):
     template_name = "comment.html"
     form_class = CommentForm
 
@@ -145,4 +122,59 @@ class CommentFormView(FormView):
         comment.save()
         return HttpResponseClientRedirect(
             reverse_lazy("post_detail", kwargs={"post_id": self.kwargs["post_id"]})
+        )
+
+
+class PostLikeView(LoginRequiredMixin, View):
+    form_class = LikeForm
+
+    def post(self, request, post_id: int, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if not Post.objects.filter(id=post_id).exists():
+            raise Http404
+
+        if form.is_valid():
+            like = Like.objects.filter(post_id=post_id, author=request.user).first()
+            like_type = form.cleaned_data["like_type"]
+            if like:
+                if like.like_type == like_type:
+                    like.delete()
+                else:
+                    like.like_type = like_type
+                    like.save()
+            else:
+                Like(post_id=post_id, author=request.user, like_type=like_type).save()
+        return HttpResponseClientRedirect(
+            reverse_lazy("post_detail", kwargs={"post_id": post_id})
+        )
+
+
+class CommentLikeView(LoginRequiredMixin, View):
+    form_class = LikeForm
+
+    def post(self, request, post_id: int, comment_id: int, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if (
+            not Post.objects.filter(id=post_id).exists()
+            or not Comment.objects.filter(post_id=post_id, id=comment_id).exists()
+        ):
+            raise Http404
+
+        if form.is_valid():
+            like = Like.objects.filter(
+                comment_id=comment_id, author=request.user
+            ).first()
+            like_type = form.cleaned_data["like_type"]
+            if like:
+                if like.like_type == like_type:
+                    like.delete()
+                else:
+                    like.like_type = like_type
+                    like.save()
+            else:
+                Like(
+                    comment_id=comment_id, author=request.user, like_type=like_type
+                ).save()
+        return HttpResponseClientRedirect(
+            reverse_lazy("post_detail", kwargs={"post_id": post_id})
         )

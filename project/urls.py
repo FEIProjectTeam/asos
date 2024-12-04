@@ -10,6 +10,8 @@ from project.views import (
     RegisterView,
     PostDetailView,
     CommentFormView,
+    PostLikeView,
+    CommentLikeView,
 )
 
 urlpatterns = [
@@ -19,6 +21,7 @@ urlpatterns = [
     path("register/", RegisterView.as_view(), name="register"),
     path("logout/", LogoutView.as_view(), name="logout"),
     path("post/<int:post_id>/", PostDetailView.as_view(), name="post_detail"),
+    path("post/<int:post_id>/like/", PostLikeView.as_view(), name="post_like"),
     path(
         "post/<int:post_id>/comment/create/",
         CommentFormView.as_view(),
@@ -28,5 +31,10 @@ urlpatterns = [
         "post/<int:post_id>/comment/<int:parent_id>/create/",
         CommentFormView.as_view(),
         name="add_reply",
+    ),
+    path(
+        "post/<int:post_id>/comment/<int:comment_id>/like/",
+        CommentLikeView.as_view(),
+        name="comment_like",
     ),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

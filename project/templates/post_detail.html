@@ -35,7 +35,11 @@
             <div class="flex items-center mt-2 gap-2">
                 <!-- Like -->
                 <div class="relative group">
-                    <button class="text-blue-500 cursor-pointer">👍 {{ post.like_count }}</button>
+                    <form hx-post="{% url 'post_like' post_id=post.id %}" hx-trigger="submit" class="w-full">
+                        {% csrf_token %}
+                        <input type="hidden" name="like_type" value="like" required>
+                        <button type="submit" class="text-blue-500 cursor-pointer">👍 {{ post.like_count }}</button>
+                    </form>
                     <div class="absolute left-0 w-max bg-white border rounded-lg shadow-lg p-2 hidden group-hover:block">
                         {% for user in post.like_authors %}
                             <p class="text-sm">{{ user }}</p>
@@ -47,7 +51,11 @@
 
                 <!-- Heart -->
                 <div class="relative group">
-                    <button class="text-red-500 cursor-pointer">❤️ {{ post.heart_count }}</button>
+                    <form hx-post="{% url 'post_like' post_id=post.id %}" hx-trigger="submit" class="w-full">
+                        {% csrf_token %}
+                        <input type="hidden" name="like_type" value="heart" required>
+                        <button type="submit" class="text-red-500 cursor-pointer">❤️ {{ post.heart_count }}</button>
+                    </form>
                     <div class="absolute left-0 w-max bg-white border rounded-lg shadow-lg p-2 hidden group-hover:block">
                         {% for user in post.heart_authors %}
                             <p class="text-sm">{{ user }}</p>
@@ -59,7 +67,11 @@
 
                 <!-- Laugh -->
                 <div class="relative group">
-                    <button class="text-yellow-500 cursor-pointer">😂 {{ post.laugh_count }}</button>
+                    <form hx-post="{% url 'post_like' post_id=post.id %}" hx-trigger="submit" class="w-full">
+                        {% csrf_token %}
+                        <input type="hidden" name="like_type" value="laugh" required>
+                        <button type="submit" class="text-yellow-500 cursor-pointer">😂 {{ post.laugh_count }}</button>
+                    </form>
                     <div class="absolute left-0 w-max bg-white border rounded-lg shadow-lg p-2 hidden group-hover:block">
                         {% for user in post.laugh_authors %}
                             <p class="text-sm">{{ user }}</p>
