@@ -114,6 +114,11 @@ class CommentFormView(LoginRequiredMixin, FormView):
     template_name = "comment.html"
     form_class = CommentForm
 
+    def get(self, request, *args, **kwargs):
+        return HttpResponseRedirect(
+            reverse("post_detail", kwargs={"post_id": self.kwargs["post_id"]})
+        )
+
     def form_valid(self, form):
         post_id: int = self.kwargs["post_id"]
         parent_id: int | None = self.kwargs.get("parent_id")
