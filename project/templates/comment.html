@@ -1,0 +1,111 @@
+{% load humanize asos_tags %}
+
+<div class="">
+    <p class="font-semibold">{{ comment.author.username }}</p>
+    <p class="text-gray-600">{{ comment.text }}</p>
+    <div class="flex items-center gap-2">
+        <p class="text-sm text-gray-400">{{ comment.created|naturaltime }}</p>
+        <button class="inline font-medium hover:text-gray-600 hover:underline transition-all"
+                onclick="toggleReplyForm(event, '{{ comment.id }}')">Reply</button>
+    </div>
+
+
+    <!-- Like Display -->
+    <div class="flex items-center mt-2 gap-2">
+        <!-- Like -->
+        <div class="relative group">
+            <form hx-post="{% url 'comment_like' post_id=comment.post_id comment_id=comment.id %}" hx-trigger="submit"
+                  class="w-full">
+                {% csrf_token %}
+                <input type="hidden" name="like_type" value="like" required>
+                <button type="submit" class="text-blue-500 cursor-pointer">👍 {{ comment.like_count }}</button>
+            </form>
+            <div class="absolute left-0 w-max bg-white border rounded-lg shadow-lg p-2 hidden group-hover:block z-50">
+                {% for user in comment.like_authors %}
+                    <p class="text-sm">{{ user }}</p>
+                {% empty %}
+                    <p class="text-sm text-gray-500">No likes yet</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Heart -->
+        <div class="relative group">
+            <form hx-post="{% url 'comment_like' post_id=comment.post_id comment_id=comment.id %}" hx-trigger="submit"
+                  class="w-full">
+                {% csrf_token %}
+                <input type="hidden" name="like_type" value="heart" required>
+                <button type="submit" class="text-blue-500 cursor-pointer">❤️ {{ comment.heart_count }}</button>
+            </form>
+            <div class="absolute left-0 w-max bg-white border rounded-lg shadow-lg p-2 hidden group-hover:block z-50">
+                {% for user in comment.heart_authors %}
+                    <p class="text-sm">{{ user }}</p>
+                {% empty %}
+                    <p class="text-sm text-gray-500">No hearts yet</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Laugh -->
+        <div class="relative group">
+            <form hx-post="{% url 'comment_like' post_id=comment.post_id comment_id=comment.id %}" hx-trigger="submit"
+                  class="w-full">
+                {% csrf_token %}
+                <input type="hidden" name="like_type" value="laugh" required>
+                <button type="submit" class="text-blue-500 cursor-pointer">😂 {{ comment.laugh_count }}</button>
+            </form>
+            <div class="absolute left-0 w-max bg-white border rounded-lg shadow-lg p-2 hidden group-hover:block z-50">
+                {% for user in comment.laugh_authors %}
+                    <p class="text-sm">{{ user }}</p>
+                {% empty %}
+                    <p class="text-sm text-gray-500">No laughs yet</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div id="reply-form-{{ comment.id }}" class="relative w-fit mt-2 hidden">
+        <form hx-post="{% url 'add_reply' post_id=post.id parent_id=comment.id %}"
+              hx-trigger="submit"
+              class="w-full">
+            {% csrf_token %}
+            <input type="text"
+                   name="text"
+                   placeholder="Reply to comment"
+                   class="border-2 border-gray-300 rounded-full p-3 pl-4 pr-10 w-[350px]"
+                   required>
+
+            <button type="submit"
+                    class="absolute top-1/2 -translate-y-1/2 right-4 text-gray-500 hover:text-red-400">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                     stroke-linejoin="round"
+                     class="icon icon-tabler icons-tabler-outline icon-tabler-send">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M10 14l11 -11"/>
+                    <path d="M21 3l-6.5 18a.55 .55 0 0 1 -1 0l-3.5 -7l-7 -3.5a.55 .55 0 0 1 0 -1l18 -6.5"/>
+                </svg>
+            </button>
+        </form>
+    </div>
+
+    {% if comment.id in replies %}
+        <div class="mt-2 space-y-2 ml-6">
+            {% for reply in replies|get_item:comment.id %}
+                {% include "comment.html" with comment=reply %}
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    function toggleReplyForm(event, commentId) {
+        event.preventDefault(); // Prevent default button behavior
+        const replyForm = document.getElementById(`reply-form-${commentId}`);
+        if (replyForm.classList.contains('hidden')) {
+            replyForm.classList.remove('hidden');
+        } else {
+            replyForm.classList.add('hidden');
+        }
+    }
+</script>

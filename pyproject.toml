@@ -10,6 +10,7 @@ dependencies = [
     "django-model-utils>=5.0.0",
     "black>=24.10.0",
     "django-htmx>=1.21.0",
+    "psycopg[binary,pool]>=3.2.3",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"
