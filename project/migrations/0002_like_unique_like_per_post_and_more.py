@@ -6,16 +6,20 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('project', '0001_initial'),
+        ("project", "0001_initial"),
     ]
 
     operations = [
         migrations.AddConstraint(
-            model_name='like',
-            constraint=models.UniqueConstraint(fields=('author', 'post'), name='unique_like_per_post'),
+            model_name="like",
+            constraint=models.UniqueConstraint(
+                fields=("author", "post"), name="unique_like_per_post"
+            ),
         ),
         migrations.AddConstraint(
-            model_name='like',
-            constraint=models.UniqueConstraint(fields=('author', 'comment'), name='unique_like_per_comment'),
+            model_name="like",
+            constraint=models.UniqueConstraint(
+                fields=("author", "comment"), name="unique_like_per_comment"
+            ),
         ),
     ]
