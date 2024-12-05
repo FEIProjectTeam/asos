@@ -33,16 +33,16 @@ class PostForm(forms.ModelForm):
             ),
         }
 
+
 class CommentForm(Form):
     text = forms.CharField()
+
 
 class AttachmentForm(forms.ModelForm):
     class Meta:
         model = Attachment
         fields = ["file"]
-        labels = {
-            "file": ""
-        }
+        labels = {"file": ""}
         widgets = {
             "file": forms.FileInput(
                 attrs={
@@ -52,6 +52,7 @@ class AttachmentForm(forms.ModelForm):
                 },
             ),
         }
+
 
 class LikeForm(Form):
     like_type = forms.ChoiceField(choices=LikeType.choices)
