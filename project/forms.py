@@ -1,8 +1,83 @@
 from django import forms
+from django.contrib.auth import password_validation
+from django.contrib.auth.models import User
 from django.forms import Form
 
 from project.models import LikeType
 from .models import Post, Attachment
+
+
+class ChangePasswordForm(forms.Form):
+    old_password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                "placeholder": "Old Password",
+                "class": "form-control rounded-2xl border-[2.5px] border-neutral-300 p-4",
+            }
+        )
+    )
+    new_password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                "placeholder": "New Password",
+                "class": "form-control rounded-2xl border-[2.5px] border-neutral-300 p-4",
+            }
+        ),
+        validators=[password_validation.validate_password],
+    )
+    confirm_password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                "placeholder": "Confirm Password",
+                "class": "form-control rounded-2xl border-[2.5px] border-neutral-300 p-4",
+            }
+        )
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop("user", None)
+        super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        new_password = self.cleaned_data["new_password"]
+        self.user.set_password(new_password)
+        if commit:
+            self.user.save()
+        return self.user
+
+    def clean(self):
+        cleaned_data = super().clean()
+        old_password = cleaned_data.get("old_password")
+        new_password = cleaned_data.get("new_password")
+        confirm_password = cleaned_data.get("confirm_password")
+
+        if not self.user.check_password(old_password):
+            self.add_error("old_password", "Old password is incorrect!")
+
+        if new_password != confirm_password:
+            self.add_error("confirm_password", "Passwords do not match!")
+
+        return cleaned_data
+
+
+class ChangeProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["username", "email"]
+        widgets = {
+            "username": forms.TextInput(
+                attrs={
+                    "placeholder": "User Name",
+                    "class": "form-control rounded-2xl border-[2.5px] border-neutral-300 p-4",
+                }
+            ),
+            "email": forms.EmailInput(
+                attrs={
+                    "placeholder": "Email",
+                    "class": "form-control rounded-2xl border-[2.5px] border-neutral-300 p-4",
+                }
+            ),
+        }
 
 
 class PostForm(forms.ModelForm):

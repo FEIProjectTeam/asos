@@ -13,10 +13,16 @@ from project.views import (
     PostLikeView,
     CommentLikeView,
     CreatePost,
+    SettingsView,
+    SettingsProfile,
+    SettingsPass,
 )
 
 
 urlpatterns = [
+    path("settings/", SettingsView.as_view(), name="settings"),
+    path("settings/profile/", SettingsProfile.as_view(), name="settingsProfile"),
+    path("settings/password/", SettingsPass.as_view(), name="settingsPass"),
     path("admin/", admin.site.urls),
     path("", HomeView.as_view(), name="home"),
     path("login/", LoginView.as_view(), name="login"),

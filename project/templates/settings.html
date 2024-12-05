@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+    <main class="min-h-[calc(100vh-80px)] p-4 pt-[80px] flex flex-col md:flex-row">
+        <nav class="flex flex-col gap-4 min-w-full md:min-w-[200px]">
+            <a href="{% url 'settingsProfile' %}"
+               class="py-2.5 px-4 rounded-full font-medium hover:underline">Profile</a>
+            <a href="{% url 'settingsPass' %}" class="py-2.5 px-4 rounded-full font-medium hover:underline">Change
+                Password</a>
+        </nav>
+        <div class="flex justify-center w-full md:w-[600px] mx-auto">
+            {% block settingsContent %} {% endblock %}
+        </div>
+    </main>
+{% endblock content %}

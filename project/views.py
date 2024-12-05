@@ -1,7 +1,12 @@
 from collections import defaultdict
 from typing import Any
 
-from django.contrib.auth import get_user_model, login, authenticate
+from django.contrib.auth import (
+    get_user_model,
+    login,
+    authenticate,
+    update_session_auth_hash,
+)
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView as DjangoLoginView
@@ -11,16 +16,103 @@ from django.http import Http404, HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse
+from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import TemplateView, CreateView, FormView
+from django.views.generic import FormView
+from django.views.generic import TemplateView, CreateView
 from django_htmx.http import HttpResponseClientRedirect
 from django_htmx.http import retarget
 
+from .forms import ChangeProfileForm, ChangePasswordForm
 from .forms import CommentForm, LikeForm
 from .forms import PostForm, AttachmentForm
 from .models import Comment, LikeType, Like
 from .models import Post
+
+
+class SettingsView(LoginRequiredMixin, TemplateView):
+    template_name = "settings.html"
+    login_url = reverse_lazy("home")
+
+
+class SettingsPass(LoginRequiredMixin, TemplateView):
+    template_name = "settingsPass.html"
+    login_url = reverse_lazy("home")
+
+    def get(self, request, *args, **kwargs):
+        changePasswordForm = ChangePasswordForm(user=request.user)
+        return render(
+            request,
+            self.template_name,
+            {
+                "change_password_form": changePasswordForm,
+            },
+        )
+
+    def post(self, request, *args, **kwargs):
+        changePasswordForm = ChangePasswordForm(user=request.user, data=request.POST)
+        if changePasswordForm.is_valid():
+            changePasswordForm.save()
+            update_session_auth_hash(
+                request, request.user
+            )  # Important to keep the user logged in
+            return render(
+                request,
+                self.template_name,
+                {
+                    "change_password_form": ChangePasswordForm(user=request.user),
+                    "success": "Password updated successfully!",
+                },
+            )
+        else:
+            return render(
+                request,
+                self.template_name,
+                {
+                    "change_password_form": changePasswordForm,
+                    "error": "Password not updated.",
+                },
+                status=400,
+            )
+
+
+class SettingsProfile(LoginRequiredMixin, TemplateView):
+    template_name = "settingsProfile.html"
+    login_url = reverse_lazy("home")
+
+    def get(self, request, *args, **kwargs):
+        changeProfileForm = ChangeProfileForm(instance=request.user)
+        return render(
+            request,
+            self.template_name,
+            {
+                "change_profile_form": changeProfileForm,
+            },
+        )
+
+    def post(self, request, *args, **kwargs):
+        changeProfileForm = ChangeProfileForm(request.POST, instance=request.user)
+        if changeProfileForm.is_valid():
+            changeProfileForm.save()
+            return render(
+                request,
+                self.template_name,
+                {
+                    "change_profile_form": changeProfileForm,
+                    "success": "Profile updated successfully!",
+                },
+            )
+        else:
+            return render(
+                request,
+                self.template_name,
+                {
+                    "change_profile_form": changeProfileForm,
+                    "error": "Profile not updated.",
+                },
+                status=400,
+            )
 
 
 class HomeView(TemplateView):
