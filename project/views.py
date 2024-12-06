@@ -312,11 +312,8 @@ class CreatePost(TemplateView):
             for file in files:
                 Attachment.objects.create(post=post, file=file)
 
-            return JsonResponse(
-                {
-                    "message": "Post and attachment created successfully!",
-                    "post_id": post.id,
-                }
+            return HttpResponseClientRedirect(
+                request.META.get("HTTP_REFERER", reverse("home"))
             )
         else:
             return render(
