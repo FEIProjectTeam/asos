@@ -80,14 +80,32 @@ class ChangeProfileForm(forms.ModelForm):
         }
 
 
+class CommentForm(Form):
+    text = forms.CharField()
+
+
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+
+class MultipleFileField(forms.FileField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("widget", MultipleFileInput())
+        super().__init__(*args, **kwargs)
+
+    def clean(self, data, initial=None):
+        single_file_clean = super().clean
+        if isinstance(data, (list, tuple)):
+            result = [single_file_clean(d, initial) for d in data]
+        else:
+            result = single_file_clean(data, initial)
+        return result
+
+
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = [
-            "title",
-            "description",
-            "category",
-        ]
+        fields = ["title", "description", "category"]
         widgets = {
             "title": forms.TextInput(
                 attrs={
@@ -109,17 +127,13 @@ class PostForm(forms.ModelForm):
         }
 
 
-class CommentForm(Form):
-    text = forms.CharField()
-
-
 class AttachmentForm(forms.ModelForm):
     class Meta:
         model = Attachment
         fields = ["file"]
         labels = {"file": ""}
         widgets = {
-            "file": forms.FileInput(
+            "file": MultipleFileInput(
                 attrs={
                     "class": "file-input form-control w-48 h-48 mt-7 rounded-2xl border-[2.5px] border-neutral-300 p-4",
                     "id": "id_file",

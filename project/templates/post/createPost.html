@@ -20,18 +20,27 @@
                 </div>
                 <div class="form-group flex flex-col gap-1 text-white">
                     <div class="relative">
-                        <svg id="input-svg" xmlns="http://www.w3.org/2000/svg"  width="45"  height="45"  viewBox="0 0 24 24"  fill="none"  stroke="#bbb"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-[calc(50%-28px)]"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 8h.01" /><path d="M12.5 21h-6.5a3 3 0 0 1 -3 -3v-12a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v6.5" /><path d="M3 16l5 -5c.928 -.893 2.072 -.893 3 0l3.5 3.5" /><path d="M14 14l1 -1c.679 -.653 1.473 -.829 2.214 -.526" /><path d="M19 22v-6" /><path d="M22 19l-3 -3l-3 3" /></svg>
+                        <label for="id_file" class="cursor-pointer">
+                            <svg id="input-svg" xmlns="http://www.w3.org/2000/svg" width="45" height="45"
+                                 viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="2" stroke-linecap="round"
+                                 stroke-linejoin="round"
+                                 class="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-[calc(50%-28px)]">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M15 8h.01"/>
+                                <path d="M12.5 21h-6.5a3 3 0 0 1 -3 -3v-12a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v6.5"/>
+                                <path d="M3 16l5 -5c.928 -.893 2.072 -.893 3 0l3.5 3.5"/>
+                                <path d="M14 14l1 -1c.679 -.653 1.473 -.829 2.214 -.526"/>
+                                <path d="M19 22v-6"/>
+                                <path d="M22 19l-3 -3l-3 3"/>
+                            </svg>
+                        </label>
                         {{ attachment_form.as_p }}
                     </div>
                     <div class="flex flex-col items-center">
                         <div id="image-preview-header"
-                             class="w-48 h-48 rounded-2xl border border-gray-300 flex items-center justify-center hidden">
-                            <img id="image-preview" class="rounded-2xl" style="max-width: 100%; max-height: 100%;"/>
+                             class="w-48 h-full rounded-2xl hidden">
+                            <!-- Image previews will be appended here -->
                         </div>
-                        <button id="delete-image"
-                            class="mt-2 hidden bg-red-600 hover:bg-red-700 text-white py-1 px-4 rounded-full"
-                            onclick="deleteImage(event)">Delete Image
-                        </button>
                     </div>
                 </div>
             </div>
@@ -43,49 +52,58 @@
 </div>
 
 <style>
-.file-input::file-selector-button {
-  display: none;
-  color: white;
-}
+    .file-input::file-selector-button {
+        display: none;
+        color: white;
+    }
 </style>
 
 <script>
     function previewImage(event) {
-    const input = event.target;
-    const preview = document.getElementById('image-preview');
-    const previewHeader = document.getElementById('image-preview-header');
-    const deleteButton = document.getElementById('delete-image');
-    const svgIcon = document.getElementById('input-svg'); // Select the SVG element
-    const reader = new FileReader();
+        const input = event.target;
+        const previewContainer = document.getElementById('image-preview-header');
+        const svgIcon = document.getElementById('input-svg');
+        const files = input.files;
+        previewContainer.innerHTML = ''; // Clear previous previews
 
-    reader.onload = function () {
-        preview.src = reader.result;
-        preview.classList.remove('hidden');
-        deleteButton.classList.remove('hidden');
-        svgIcon.classList.add('hidden'); // Hide the SVG icon
-    };
+        if (files.length > 0) {
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const imgContainer = document.createElement('div');
+                    imgContainer.classList.add('relative', 'w-full', 'h-12', 'rounded-2xl', 'border', 'border-gray-300', 'mb-1');
 
-    if (input.files && input.files[0]) {
-        reader.readAsDataURL(input.files[0]);
-        previewHeader.classList.remove('hidden');
-        input.classList.add('hidden');
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.classList.add('rounded-2xl');
+                    img.style.maxWidth = '100%'
+                    img.style.maxHeight = '100%';
+
+                    const deleteButton = document.createElement('button');
+                    deleteButton.classList.add('bg-red-600', 'hover:bg-red-700', 'text-white', 'w-6', 'h-6', 'max-w-6', 'max-h-6', 'rounded-full', 'flex', 'items-center', 'justify-center', 'absolute', 'right-1', 'top-2');
+                    deleteButton.innerHTML = '&times;';
+                    deleteButton.onclick = function () {
+                        imgContainer.remove();
+                        const newFiles = Array.from(input.files).filter(file => file !== files[i]);
+                        const dataTransfer = new DataTransfer();
+                        newFiles.forEach(file => dataTransfer.items.add(file));
+                        input.files = dataTransfer.files;
+                        if (previewContainer.children.length === 0) {
+                            input.classList.remove('hidden');
+                            previewContainer.classList.add('hidden');
+                            svgIcon.classList.remove('hidden');
+                        }
+                    };
+                    imgContainer.appendChild(deleteButton);
+                    imgContainer.appendChild(img);
+                    previewContainer.appendChild(imgContainer);
+                };
+                reader.readAsDataURL(file);
+            }
+            input.classList.add('hidden');
+            previewContainer.classList.remove('hidden');
+            svgIcon.classList.add('hidden');
+        }
     }
-}
-
-function deleteImage(event) {
-    event.preventDefault();
-    const input = document.getElementById('id_file');
-    const preview = document.getElementById('image-preview');
-    const previewHeader = document.getElementById('image-preview-header');
-    const deleteButton = document.getElementById('delete-image');
-    const svgIcon = document.getElementById('input-svg'); // Select the SVG element
-
-    input.value = '';
-    preview.src = '';
-    input.classList.remove('hidden');
-    preview.classList.add('hidden');
-    deleteButton.classList.add('hidden');
-    previewHeader.classList.add('hidden');
-    svgIcon.classList.remove('hidden'); // Show the SVG icon back when image is removed
-}
 </script>

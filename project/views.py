@@ -27,7 +27,7 @@ from django_htmx.http import retarget
 from .forms import ChangeProfileForm, ChangePasswordForm
 from .forms import CommentForm, LikeForm
 from .forms import PostForm, AttachmentForm
-from .models import Comment, LikeType, Like
+from .models import Comment, LikeType, Like, Attachment
 from .models import Post
 
 
@@ -148,7 +148,7 @@ class RegisterView(CreateView):
 
 
 class PostDetailView(TemplateView):
-    template_name = "post_detail.html"
+    template_name = "post/post_detail.html"
 
     def _annotate_like_count(self, like_type: LikeType = LikeType.LIKE):
         return Count("likes", filter=Q(likes__like_type=like_type), distinct=True)
@@ -303,15 +303,14 @@ class CreatePost(TemplateView):
 
     def post(self, request, *args, **kwargs):
         post_form = PostForm(request.POST, request.FILES)
-        attachment_form = AttachmentForm(request.POST, request.FILES)
-        if post_form.is_valid() and attachment_form.is_valid():
+        files = request.FILES.getlist("file")
+        if post_form.is_valid():
             post = post_form.save(commit=False)
             post.author = request.user
             post.save()
 
-            attachment = attachment_form.save(commit=False)
-            attachment.post = post
-            attachment.save()
+            for file in files:
+                Attachment.objects.create(post=post, file=file)
 
             return JsonResponse(
                 {
@@ -325,7 +324,6 @@ class CreatePost(TemplateView):
                 self.template_name,
                 {
                     "post_form": post_form.errors,
-                    "attachment_form": attachment_form.errors,
                 },
                 status=400,
             )
