@@ -1,6 +1,11 @@
 from django import forms
 from django.contrib.auth import password_validation
+from django.contrib.auth.forms import (
+    UserCreationForm as DjUserCreationForm,
+    UsernameField,
+)
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.forms import Form
 
 from project.models import LikeType
@@ -131,3 +136,28 @@ class AttachmentForm(forms.ModelForm):
 
 class LikeForm(Form):
     like_type = forms.ChoiceField(choices=LikeType.choices)
+
+
+class UserCreationForm(DjUserCreationForm):
+    field_order = ["username", "email", "password1", "password2"]
+    email = forms.EmailField(required=True)
+
+    class Meta:
+        model = User
+        fields = ("username", "email")
+        field_classes = {"username": UsernameField}
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        if email and self._meta.model.objects.filter(email__iexact=email).exists():
+            self._update_errors(
+                ValidationError(
+                    {
+                        "email": self.instance.unique_error_message(
+                            self._meta.model, ["email"]
+                        )
+                    }
+                )
+            )
+        else:
+            return email

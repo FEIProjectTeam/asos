@@ -7,7 +7,6 @@ from django.contrib.auth import (
     authenticate,
     update_session_auth_hash,
 )
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib.postgres.aggregates import ArrayAgg
@@ -24,7 +23,7 @@ from django.views.generic import TemplateView, CreateView
 from django_htmx.http import HttpResponseClientRedirect
 from django_htmx.http import retarget
 
-from .forms import ChangeProfileForm, ChangePasswordForm
+from .forms import ChangeProfileForm, ChangePasswordForm, UserCreationForm
 from .forms import CommentForm, LikeForm
 from .forms import PostForm, AttachmentForm
 from .models import Comment, LikeType, Like
