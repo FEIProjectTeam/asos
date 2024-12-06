@@ -1,6 +1,6 @@
 {% for post in page_obj %}
     <a href="{% url 'post_detail' post_id=post.id %}"
-       class="w-56 h-96 group hover:ring-8 hover:ring-gray-200 rounded-2xl"
+       class="w-56 h-[26rem] group hover:ring-8 hover:ring-gray-200 rounded-2xl"
         {% if forloop.last and page_obj.has_next %}
            hx-get="{% url 'post_list' %}?page={{ page_obj.next_page_number }}"
            hx-trigger="revealed"
@@ -24,6 +24,7 @@
         </div>
         <div class="w-56 h-18 flex flex-col group-hover:bg-gray-200 rounded-b-2xl">
             <div class="h-8 font-semibold truncate leading-8 cursor-pointer">{{ post.title }}</div>
+            <div class="h-8 truncate leading-8 cursor-pointer">{{ post.category.name }}</div>
             <div class="flex flex-row cursor-pointer">
                 <div class="rounded-full w-10 h-10 bg-neutral-500"></div>
                 <div class="flex justify-start items-center gap-4 ms-2">
