@@ -12,12 +12,12 @@ from project.views import (
     CommentFormView,
     PostLikeView,
     CommentLikeView,
-    CreatePost,
+    PostCreateView,
     SettingsView,
     SettingsProfile,
     SettingsPass,
+    PostListView,
 )
-
 
 urlpatterns = [
     path("settings/", SettingsView.as_view(), name="settings"),
@@ -28,7 +28,8 @@ urlpatterns = [
     path("login/", LoginView.as_view(), name="login"),
     path("register/", RegisterView.as_view(), name="register"),
     path("logout/", LogoutView.as_view(), name="logout"),
-    path("create-post/", CreatePost.as_view(), name="create-post"),
+    path("posts/", PostListView.as_view(), name="post_list"),
+    path("post/create/", PostCreateView.as_view(), name="post_create"),
     path("post/<int:post_id>/", PostDetailView.as_view(), name="post_detail"),
     path("post/<int:post_id>/like/", PostLikeView.as_view(), name="post_like"),
     path(

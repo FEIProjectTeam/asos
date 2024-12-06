@@ -10,7 +10,7 @@ from django.contrib.auth import (
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import Count, Q, Value, Prefetch
+from django.db.models import Count, Q, Value, Prefetch, Subquery, OuterRef
 from django.http import Http404, HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
@@ -18,7 +18,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import FormView
+from django.views.generic import FormView, ListView
 from django.views.generic import TemplateView, CreateView
 from django_htmx.http import HttpResponseClientRedirect
 from django_htmx.http import retarget
@@ -146,11 +146,12 @@ class RegisterView(CreateView):
         return HttpResponseClientRedirect(self.get_success_url())
 
 
+def annotate_like_count(like_type: LikeType = LikeType.LIKE):
+    return Count("likes", filter=Q(likes__like_type=like_type), distinct=True)
+
+
 class PostDetailView(TemplateView):
     template_name = "post/post_detail.html"
-
-    def _annotate_like_count(self, like_type: LikeType = LikeType.LIKE):
-        return Count("likes", filter=Q(likes__like_type=like_type), distinct=True)
 
     def _annotate_like_authors(self, like_type: LikeType = LikeType.LIKE):
         return ArrayAgg(
@@ -169,9 +170,9 @@ class PostDetailView(TemplateView):
             .select_related("category")
             .prefetch_related("attachments", likes_prefetch)
             .annotate(
-                like_count=self._annotate_like_count(),
-                heart_count=self._annotate_like_count(LikeType.HEART),
-                laugh_count=self._annotate_like_count(LikeType.LAUGH),
+                like_count=annotate_like_count(),
+                heart_count=annotate_like_count(LikeType.HEART),
+                laugh_count=annotate_like_count(LikeType.LAUGH),
                 like_authors=self._annotate_like_authors(),
                 heart_authors=self._annotate_like_authors(LikeType.HEART),
                 laugh_authors=self._annotate_like_authors(LikeType.LAUGH),
@@ -182,9 +183,9 @@ class PostDetailView(TemplateView):
             .select_related("author")
             .prefetch_related("likes__author")
             .annotate(
-                like_count=self._annotate_like_count(),
-                heart_count=self._annotate_like_count(LikeType.HEART),
-                laugh_count=self._annotate_like_count(LikeType.LAUGH),
+                like_count=annotate_like_count(),
+                heart_count=annotate_like_count(LikeType.HEART),
+                laugh_count=annotate_like_count(LikeType.LAUGH),
                 like_authors=self._annotate_like_authors(),
                 heart_authors=self._annotate_like_authors(LikeType.HEART),
                 laugh_authors=self._annotate_like_authors(LikeType.LAUGH),
@@ -288,8 +289,8 @@ class CommentLikeView(BaseLikeView):
         )
 
 
-class CreatePost(TemplateView):
-    template_name = "post/createPost.html"
+class PostCreateView(LoginRequiredMixin, TemplateView):
+    template_name = "post/post_create.html"
 
     def get(self, request, *args, **kwargs):
         post_form = PostForm()
@@ -311,11 +312,8 @@ class CreatePost(TemplateView):
             for file in files:
                 Attachment.objects.create(post=post, file=file)
 
-            return JsonResponse(
-                {
-                    "message": "Post and attachment created successfully!",
-                    "post_id": post.id,
-                }
+            return HttpResponseClientRedirect(
+                request.META.get("HTTP_REFERER", reverse("home"))
             )
         else:
             return render(
@@ -326,3 +324,26 @@ class CreatePost(TemplateView):
                 },
                 status=400,
             )
+
+
+class PostListView(ListView):
+    template_name = "post/post_list.html"
+    paginate_by = 30
+
+    def get_queryset(self):
+        first_file_subquery = (
+            Attachment.objects.filter(post=OuterRef("pk"))
+            .order_by("created")
+            .values("file")[:1]
+        )
+        posts = (
+            Post.objects.order_by("-created")
+            .select_related("author", "category")
+            .annotate(
+                first_file_path=Subquery(first_file_subquery),
+                like_count=annotate_like_count(),
+                heart_count=annotate_like_count(LikeType.HEART),
+                laugh_count=annotate_like_count(LikeType.LAUGH),
+            )
+        )
+        return posts
