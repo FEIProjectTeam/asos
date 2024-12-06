@@ -18,8 +18,8 @@
                 <div class="form-group flex flex-col gap-1">
                     {{ post_form }}
                 </div>
-                <div class="form-group flex flex-col gap-1 text-white">
-                    <div class="relative">
+                <div class="form-group flex flex-col gap-1 text-white max-h-[19em] overflow-y-auto overflow-x-hidden">
+                    <div class="relative ">
                         <label for="id_file" class="cursor-pointer">
                             <svg id="input-svg" xmlns="http://www.w3.org/2000/svg" width="45" height="45"
                                  viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="2" stroke-linecap="round"
@@ -64,7 +64,6 @@
         const previewContainer = document.getElementById('image-preview-header');
         const svgIcon = document.getElementById('input-svg');
         const files = input.files;
-        previewContainer.innerHTML = ''; // Clear previous previews
 
         if (files.length > 0) {
             for (let i = 0; i < files.length; i++) {
@@ -72,16 +71,16 @@
                 const reader = new FileReader();
                 reader.onload = function (e) {
                     const imgContainer = document.createElement('div');
-                    imgContainer.classList.add('relative', 'w-full', 'h-12', 'rounded-2xl', 'border', 'border-gray-300', 'mb-1');
+                    imgContainer.classList.add('relative', 'w-full', 'h-12', 'rounded-2xl', 'border-[2.5px]', 'border-gray-300', 'mb-1');
 
                     const img = document.createElement('img');
                     img.src = e.target.result;
                     img.classList.add('rounded-2xl');
-                    img.style.maxWidth = '100%'
+                    img.style.maxWidth = '100%';
                     img.style.maxHeight = '100%';
 
                     const deleteButton = document.createElement('button');
-                    deleteButton.classList.add('bg-red-600', 'hover:bg-red-700', 'text-white', 'w-6', 'h-6', 'max-w-6', 'max-h-6', 'rounded-full', 'flex', 'items-center', 'justify-center', 'absolute', 'right-1', 'top-2');
+                    deleteButton.classList.add('bg-red-600', 'hover:bg-red-700', 'text-white', 'w-8', 'h-8', 'rounded-xl', 'flex', 'items-center', 'justify-center', 'absolute', 'right-1', 'top-1');
                     deleteButton.innerHTML = '&times;';
                     deleteButton.onclick = function () {
                         imgContainer.remove();
@@ -90,9 +89,7 @@
                         newFiles.forEach(file => dataTransfer.items.add(file));
                         input.files = dataTransfer.files;
                         if (previewContainer.children.length === 0) {
-                            input.classList.remove('hidden');
                             previewContainer.classList.add('hidden');
-                            svgIcon.classList.remove('hidden');
                         }
                     };
                     imgContainer.appendChild(deleteButton);
@@ -101,9 +98,7 @@
                 };
                 reader.readAsDataURL(file);
             }
-            input.classList.add('hidden');
             previewContainer.classList.remove('hidden');
-            svgIcon.classList.add('hidden');
         }
     }
 </script>
