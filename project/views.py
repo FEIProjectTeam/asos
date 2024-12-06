@@ -338,7 +338,7 @@ class PostListView(ListView):
         )
         posts = (
             Post.objects.order_by("-created")
-            .select_related("author")
+            .select_related("author", "category")
             .annotate(
                 first_file_path=Subquery(first_file_subquery),
                 like_count=annotate_like_count(),
