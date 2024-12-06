@@ -11,7 +11,7 @@
             <h2 class="text-3xl font-medium">Create a New Post</h2>
         </div>
 
-        <form hx-post="{% url 'create-post' %}" hx-target="#create-post-modal" hx-swap="outerHTML"
+        <form hx-post="{% url 'post_create' %}" hx-target="#create-post-modal" hx-swap="outerHTML"
               class="flex flex-col gap-2 min-w-[600px]" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="flex flex-inline gap-3">

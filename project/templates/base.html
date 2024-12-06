@@ -16,7 +16,7 @@
             <span class="text-2xl font-medium text-red-600 tracking-tighter">Asos</span>
         </a>
         {% if user.is_authenticated %}
-            <button hx-get="{% url 'create-post' %}" hx-target="#modal-placeholder" hx-swap="innerHTML" class="fixed right-6 bottom-6 bg-red-500 hover:bg-red-700 text-white font-bold size-20 shadow-md hover:scale-105 transition-all grid place-items-center rounded-full">
+            <button hx-get="{% url 'post_create' %}" hx-target="#modal-placeholder" hx-swap="innerHTML" class="fixed right-6 bottom-6 bg-red-500 hover:bg-red-700 text-white font-bold size-20 shadow-md hover:scale-105 transition-all grid place-items-center rounded-full">
                <svg  xmlns="http://www.w3.org/2000/svg"  width="40"  height="40"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="3"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-plus"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
             </button>
         {% endif %}

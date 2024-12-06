@@ -289,7 +289,7 @@ class CommentLikeView(BaseLikeView):
         )
 
 
-class CreatePost(TemplateView):
+class PostCreateView(LoginRequiredMixin, TemplateView):
     template_name = "post/post_create.html"
 
     def get(self, request, *args, **kwargs):
