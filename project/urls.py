@@ -16,10 +16,8 @@ from project.views import (
     SettingsView,
     SettingsProfile,
     SettingsPass,
-    ImageView
+    PostListView,
 )
-
-from project.views import HomeView, LoginView, RegisterView, ImageView
 
 urlpatterns = [
     path("settings/", SettingsView.as_view(), name="settings"),
@@ -30,7 +28,7 @@ urlpatterns = [
     path("login/", LoginView.as_view(), name="login"),
     path("register/", RegisterView.as_view(), name="register"),
     path("logout/", LogoutView.as_view(), name="logout"),
-    path("images/", ImageView.as_view(), name="images"),
+    path("posts/", PostListView.as_view(), name="post_list"),
     path("create-post/", CreatePost.as_view(), name="create-post"),
     path("post/<int:post_id>/", PostDetailView.as_view(), name="post_detail"),
     path("post/<int:post_id>/like/", PostLikeView.as_view(), name="post_like"),
