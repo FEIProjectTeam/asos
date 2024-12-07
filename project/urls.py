@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.contrib.auth.views import LogoutView
 from django.conf import settings
 from django.conf.urls.static import static
@@ -20,11 +20,12 @@ from project.views import (
 )
 
 urlpatterns = [
+    path("", HomeView.as_view(), name="home"),
+    path("admin/", admin.site.urls),
+    path("accounts/", include("allauth.urls")),
     path("settings/", SettingsView.as_view(), name="settings"),
     path("settings/profile/", SettingsProfile.as_view(), name="settingsProfile"),
     path("settings/password/", SettingsPass.as_view(), name="settingsPass"),
-    path("admin/", admin.site.urls),
-    path("", HomeView.as_view(), name="home"),
     path("login/", LoginView.as_view(), name="login"),
     path("register/", RegisterView.as_view(), name="register"),
     path("logout/", LogoutView.as_view(), name="logout"),

@@ -12,19 +12,33 @@
 -e file:.
 asgiref==3.8.1
     # via django
+    # via django-allauth
     # via django-htmx
 black==24.10.0
     # via asos
+certifi==2024.8.30
+    # via requests
+cffi==1.17.1
+    # via cryptography
+charset-normalizer==3.4.0
+    # via requests
 click==8.1.7
     # via black
+cryptography==44.0.0
+    # via asos
 django==4.2.16
     # via asos
+    # via django-allauth
     # via django-htmx
     # via django-model-utils
+django-allauth==65.3.0
+    # via asos
 django-htmx==1.21.0
     # via asos
 django-model-utils==5.0.0
     # via asos
+idna==3.10
+    # via requests
 mypy-extensions==1.0.0
     # via black
 packaging==24.2
@@ -39,8 +53,16 @@ psycopg-binary==3.2.3
     # via psycopg
 psycopg-pool==3.2.4
     # via psycopg
+pycparser==2.22
+    # via cffi
+pyjwt==2.10.1
+    # via asos
+requests==2.32.3
+    # via asos
 sqlparse==0.5.2
     # via django
 typing-extensions==4.12.2
     # via psycopg
     # via psycopg-pool
+urllib3==2.2.3
+    # via requests
