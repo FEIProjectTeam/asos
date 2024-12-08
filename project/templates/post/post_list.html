@@ -6,25 +6,25 @@
            hx-trigger="revealed"
            hx-swap="beforeend"
         {% endif %}>
-        <div class="w-56 h-[312px] content-end hover:bg-gray-200 relative">
+        <div class="w-56 h-[312px] content-end group-hover:bg-gray-200 relative">
             <img src="{{ MEDIA_URL }}{{ post.first_file_path }}" alt="{{ post.title }}"
                  class="cursor-pointer rounded-2xl w-full h-full object-center object-cover">
 
             <div class="items-center group-hover:flex hidden bottom-0 absolute bg-black/40 justify-center w-full items-center pb-3 pt-1 gap-2 rounded-b-2xl backdrop-blur">
                 <div class="relative translate-y-1">
-                    <span class="text-sky-400 cursor-pointer rounded-md hover:bg-sky-500 hover:ring hover:ring-sky-500 hover:text-white pe-0.5">👍 {{ post.like_count }}</span>
+                    <span class="text-sky-400 cursor-pointer rounded-md pe-0.5">👍 {{ post.like_count }}</span>
                 </div>
                 <div class="relative translate-y-1">
-                    <span class="text-red-300 cursor-pointer rounded-md hover:bg-red-500 hover:ring hover:ring-red-500 hover:text-white pe-0.5">❤️ {{ post.heart_count }}</span>
+                    <span class="text-red-300 cursor-pointer rounded-md pe-0.5">❤️ {{ post.heart_count }}</span>
                 </div>
                 <div class="relative translate-y-1">
-                    <span class="text-yellow-400 cursor-pointer rounded-md hover:bg-yellow-500 hover:ring hover:ring-yellow-500 hover:text-black pe-0.5">😂 {{ post.laugh_count }}</span>
+                    <span class="text-yellow-400 cursor-pointer rounded-md pe-0.5">😂 {{ post.laugh_count }}</span>
                 </div>
             </div>
         </div>
         <div class="w-56 h-18 flex flex-col group-hover:bg-gray-200 rounded-b-2xl">
             <div class="h-8 font-semibold truncate leading-8 cursor-pointer">{{ post.title }}</div>
-            <div class="h-8 truncate leading-8 cursor-pointer">{{ post.category.name }}</div>
+            <div class="h-8 font-medium text-gray-500 truncate cursor-pointer">{{ post.category.name }}</div>
             <div class="flex flex-row cursor-pointer">
                 <div class="rounded-full w-10 h-10 bg-neutral-500"></div>
                 <div class="flex justify-start items-center gap-4 ms-2">
