@@ -19,9 +19,11 @@
             {% endfor %}
 
             <div class="flex justify-center mt-4 gap-1">
-                {% for attachment in post.attachments.all %}
-                    <div class="dot size-3 bg-gray-400 rounded-full cursor-pointer" onclick="currentSlide({{ forloop.counter }})"></div>
-                {% endfor %}
+                {% if post.attachments.all|length > 1 %}
+                    {% for attachment in post.attachments.all %}
+                        <div class="dot size-3 bg-gray-400 rounded-full cursor-pointer" onclick="currentSlide({{ forloop.counter }})"></div>
+                    {% endfor %}
+                {% endif %}
             </div>
         </div>
 
