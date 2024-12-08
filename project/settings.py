@@ -127,6 +127,9 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = True
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
