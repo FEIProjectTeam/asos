@@ -57,6 +57,8 @@ pycparser==2.22
     # via cffi
 pyjwt==2.10.1
     # via asos
+python-dotenv==1.0.1
+    # via asos
 requests==2.32.3
     # via asos
 sqlparse==0.5.2
