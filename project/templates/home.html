@@ -3,7 +3,8 @@
 {% block content %}
     <main class="flex justify-center">
         <div class="flex flex-wrap justify-normal gap-4 mx-8 masnory"
-             hx-get="{% url 'post_list' %}{% if search %}?search={{ search }}{% endif %}" hx-trigger="load"
+             hx-get="{% url 'post_list' %}{% if search %}?search={{ search }}{% endif %}"
+             hx-trigger="load"
              hx-target="this">
         </div>
     </main>
