@@ -140,7 +140,7 @@ class AttachmentForm(forms.ModelForm):
         widgets = {
             "file": MultipleFileInput(
                 attrs={
-                    "class": "file-input form-control w-48 h-14 mt-7 rounded-2xl border-[2.5px] border-neutral-300 p-4",
+                    "class": "file-input form-control w-48 h-15 mt-7 rounded-2xl border-[2.5px] border-neutral-300 p-4",
                     "id": "id_file",
                     "onchange": "previewImage(event)",
                 },

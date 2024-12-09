@@ -117,6 +117,11 @@ class SettingsProfile(LoginRequiredMixin, TemplateView):
 class HomeView(TemplateView):
     template_name = "home.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["search"] = self.request.GET.get("search")
+        return context
+
 
 class LoginView(DjangoLoginView):
     template_name = "auth/login.html"
@@ -328,16 +333,26 @@ class PostCreateView(LoginRequiredMixin, TemplateView):
 
 class PostListView(ListView):
     template_name = "post/post_list.html"
-    paginate_by = 30
+    paginate_by = 20
 
     def get_queryset(self):
+        search_filter = Q()
+        search = self.request.GET.get("search")
+        if search:
+            search_filter = (
+                Q(title__icontains=search)
+                | Q(description__icontains=search)
+                | Q(category__name__icontains=search)
+                | Q(author__username__icontains=search)
+            )
         first_file_subquery = (
             Attachment.objects.filter(post=OuterRef("pk"))
             .order_by("created")
             .values("file")[:1]
         )
         posts = (
-            Post.objects.order_by("-created")
+            Post.objects.filter(search_filter)
+            .order_by("-created")
             .select_related("author", "category")
             .annotate(
                 first_file_path=Subquery(first_file_subquery),
@@ -347,3 +362,8 @@ class PostListView(ListView):
             )
         )
         return posts
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(object_list=None, **kwargs)
+        context["search"] = self.request.GET.get("search")
+        return context

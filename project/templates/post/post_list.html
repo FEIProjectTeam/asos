@@ -2,9 +2,9 @@
     <a href="{% url 'post_detail' post_id=post.id %}"
        class="w-56 h-[26rem] group hover:ring-8 hover:ring-gray-200 rounded-2xl"
         {% if forloop.last and page_obj.has_next %}
-           hx-get="{% url 'post_list' %}?page={{ page_obj.next_page_number }}"
-           hx-trigger="revealed"
-           hx-swap="beforeend"
+       hx-get="{% url 'post_list' %}?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}"
+       hx-trigger="revealed"
+       hx-swap="beforeend"
         {% endif %}>
         <div class="w-56 h-[312px] content-end group-hover:bg-gray-200 relative">
             <img src="{{ MEDIA_URL }}{{ post.first_file_path }}" alt="{{ post.title }}"
