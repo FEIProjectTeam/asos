@@ -1,5 +1,5 @@
 <div id="create-post-modal" hx-get="{% url 'home' %}" hx-swap="delete"
-     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+     class="fixed inset-0 z-[999999] flex items-center justify-center bg-black bg-opacity-50">
     <div onclick="event.stopPropagation()" class="bg-white shadow-xl min-w-[600px] max-w-[800px] p-12 rounded-3xl">
         <div class="flex flex-inline items-center gap-3 mb-8">
             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="#dc2626"
@@ -19,12 +19,12 @@
                     {{ post_form }}
                 </div>
                 <div class="form-group flex flex-col gap-1 text-white max-h-[19em] overflow-y-auto overflow-x-hidden">
-                    <div class="relative ">
+                    <div class="relative">
                         <label for="id_file" class="cursor-pointer">
-                            <svg id="input-svg" xmlns="http://www.w3.org/2000/svg" width="45" height="45"
-                                 viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="2" stroke-linecap="round"
+                            <svg id="input-svg" xmlns="http://www.w3.org/2000/svg" width="37" height="37"
+                                 viewBox="0 0 24 24" fill="none" stroke="#D4D4D4" stroke-width="1.2" stroke-linecap="round"
                                  stroke-linejoin="round"
-                                 class="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-[calc(50%-28px)]">
+                                 class="absolute top-1/2 left-7 -translate-x-1/2 translate-y-[calc(50%-23px)]">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                 <path d="M15 8h.01"/>
                                 <path d="M12.5 21h-6.5a3 3 0 0 1 -3 -3v-12a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v6.5"/>
@@ -34,12 +34,12 @@
                                 <path d="M22 19l-3 -3l-3 3"/>
                             </svg>
                         </label>
+                        <div class="absolute top-1/2 cursor-pointer pointer-events-none left-[100px] w-max -translate-x-1/2 translate-y-[calc(50%-10px)] text-[#D4D4D4]">Choose photo</div>
                         {{ attachment_form.as_p }}
                     </div>
                     <div class="flex flex-col items-center">
                         <div id="image-preview-header"
                              class="w-48 h-full rounded-2xl hidden">
-                            <!-- Image previews will be appended here -->
                         </div>
                     </div>
                 </div>
@@ -71,16 +71,16 @@
                 const reader = new FileReader();
                 reader.onload = function (e) {
                     const imgContainer = document.createElement('div');
-                    imgContainer.classList.add('relative', 'w-full', 'h-12', 'rounded-2xl', 'border-[2.5px]', 'border-gray-300', 'mb-1');
+                    imgContainer.classList.add('flex', 'items-center', 'justify-between', 'flex-row-reverse', 'w-full', 'h-12', 'p-[2px]', 'rounded-xl', 'border-[2.5px]', 'border-gray-300', 'mb-1');
 
                     const img = document.createElement('img');
                     img.src = e.target.result;
-                    img.classList.add('rounded-2xl');
+                    img.classList.add('rounded-[10px]');
                     img.style.maxWidth = '100%';
                     img.style.maxHeight = '100%';
 
                     const deleteButton = document.createElement('button');
-                    deleteButton.classList.add('bg-red-600', 'hover:bg-red-700', 'text-white', 'w-8', 'h-8', 'rounded-xl', 'flex', 'items-center', 'justify-center', 'absolute', 'right-1', 'top-1');
+                    deleteButton.classList.add('hover:text-red-500', 'text-gray-300', 'text-xl', 'pr-3', 'rounded-md', 'grid', 'place-items-center');
                     deleteButton.innerHTML = '&times;';
                     deleteButton.onclick = function () {
                         imgContainer.remove();
