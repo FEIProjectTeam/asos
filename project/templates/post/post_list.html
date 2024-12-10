@@ -1,11 +1,15 @@
 {% for post in page_obj %}
     <a href="{% url 'post_detail' post_id=post.id %}"
        class="w-56 h-[26rem] group hover:ring-8 hover:ring-gray-200 rounded-2xl"
-        {% if forloop.last and page_obj.has_next %}
+            {% if forloop.last %}
+                {% if page_obj.has_next %}
        hx-get="{% url 'post_list' %}?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}"
+                {% else %}
+       hx-get="{% url 'post_list' %}?page=1{% if search %}&search={{ search }}{% endif %}"
+                {% endif %}
        hx-trigger="revealed"
        hx-swap="beforeend"
-        {% endif %}>
+            {% endif %}>
         <div class="w-56 h-[312px] content-end group-hover:bg-gray-200 relative">
             <img src="{{ MEDIA_URL }}{{ post.first_file_path }}" alt="{{ post.title }}"
                  class="cursor-pointer rounded-2xl w-full h-full object-center object-cover">
@@ -26,7 +30,15 @@
             <div class="h-8 font-semibold truncate leading-8 cursor-pointer">{{ post.title }}</div>
             <div class="h-8 font-medium text-gray-500 truncate cursor-pointer">{{ post.category.name }}</div>
             <div class="flex flex-row cursor-pointer">
-                <div class="rounded-full w-10 h-10 bg-neutral-500"></div>
+
+                <div class="relative w-10 h-10 overflow-hidden bg-gray-400 rounded-full dark:bg-gray-300">
+                    <svg class="absolute w-12 h-12 text-gray-400 -left-1" fill="currentColor" viewBox="0 0 20 20"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                              clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+
                 <div class="flex justify-start items-center gap-4 ms-2">
                     {{ post.author.username }}
                 </div>
